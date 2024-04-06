@@ -1,7 +1,7 @@
 import gleeunit
 import gleeunit/should
 import gleam/json
-import gleam/dynamic.{field, int, string}
+import gleam/dynamic.{field, float, int, string}
 
 pub fn main() {
   gleeunit.main()
@@ -63,4 +63,62 @@ pub fn decode_nested_record_test() {
 
   json.decode(from: json_string, using: decoder)
   |> should.equal(Ok(Outer(i: Inner(s: "ramen"))))
+}
+
+/// complex case
+///
+pub type ListItems {
+  ListItems(items: List(Item), limit: Int, offset: Int, total: Int)
+}
+
+pub type Item {
+  Item(name: String, size: Float)
+}
+
+pub fn decode_complex_items_test() {
+  let json_string =
+    "{
+    \"items\": [
+      {
+        \"name\": \"yamada\",
+        \"size\": 26.0
+      },
+      {
+        \"name\": \"tanaka\",
+        \"size\": 28.0
+      }
+    ],
+    \"limit\": 10,
+    \"offset\": 0,
+    \"total\": 2
+  }"
+
+  let decoder =
+    dynamic.decode4(
+      ListItems,
+      field(
+        "items",
+        of: dynamic.list(of: dynamic.decode2(
+          Item,
+          field("name", of: string),
+          field("size", of: float),
+        )),
+      ),
+      field("limit", of: int),
+      field("offset", of: int),
+      field("total", of: int),
+    )
+
+  json.decode(from: json_string, using: decoder)
+  |> should.equal(
+    Ok(ListItems(
+      items: [
+        Item(name: "yamada", size: 26.0),
+        Item(name: "tanaka", size: 28.0),
+      ],
+      limit: 10,
+      offset: 0,
+      total: 2,
+    )),
+  )
 }
