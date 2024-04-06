@@ -53,10 +53,10 @@ type Inner {
 pub fn decode_nested_record_test() {
   let json_string =
     "{
-    \"inner\": {
-      \"str\": \"ramen\"
-    }
-  }"
+      \"inner\": {
+        \"str\": \"ramen\"
+      }
+    }"
 
   let inner_decoder = dynamic.decode1(Inner, field("str", of: string))
   let decoder = dynamic.decode1(Outer, field("inner", of: inner_decoder))
@@ -78,20 +78,20 @@ pub type Item {
 pub fn decode_complex_items_test() {
   let json_string =
     "{
-    \"items\": [
-      {
-        \"name\": \"yamada\",
-        \"size\": 26.0
-      },
-      {
-        \"name\": \"tanaka\",
-        \"size\": 28.0
-      }
-    ],
-    \"limit\": 10,
-    \"offset\": 0,
-    \"total\": 2
-  }"
+      \"items\": [
+        {
+          \"name\": \"yamada\",
+          \"size\": 26.0
+        },
+        {
+          \"name\": \"tanaka\",
+          \"size\": 28.0
+        }
+      ],
+      \"limit\": 10,
+      \"offset\": 0,
+      \"total\": 2
+    }"
 
   let decoder =
     dynamic.decode4(
